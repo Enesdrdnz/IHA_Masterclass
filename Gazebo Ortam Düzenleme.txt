@@ -1,0 +1,90 @@
+#1 ----------------------------------------------------
+mkdir -p gz_ws/src && cd gz_ws/src
+git clone https://github.com/ArduPilot/ardupilot_gazebo
+
+gz_ws/src/ardupilot_gazebo/models içerisinden
+runway klasörünü masaüstüne alalım
+
+PX4-Autopilot/Tools/simulation/gz/models 
+içerisine ekleyelim
+
+runway klasörünün içerisindeki model.sdf dosyasında
+<visual name="runway"> altındaki satırı bununla değiştirelim.
+        <pose degrees="true">-6 -590.5 0 0 0 85</pose>
+sonra
+PX4-Autopilot/Tools/simulation/gz/worlds 
+içerisinden default.sdf e bu runway i ekleyelim
+<include>
+    <pose degrees="true">-29 545 0.05 0 0 363</pose>
+    <uri>model://runway</uri>
+</include>
+--------------------------------------------------------
+#2------------------------------------------------------
+gz_ws/src/ardupilot_gazebo/models/advanced_plane 
+içerisindeki models.sdf dosyasında ise
+önce pose satırını bu şekilde ayarlayın
+<model name='advanced_plane'>
+    <pose degrees="true">0 0 0.246 0 0 269</pose>
+ve sonra gösterdiğim yere 
+bu kodu yapıştırın
+--- ROBOT KAMERA KODU (SDF) ---
+<link name="camera_link">
+      <pose relative_to="base_link">0.2 0 -0.05 0 0 0</pose>
+      <inertial>
+        <mass>0.01</mass>
+        <inertia>
+          <ixx>0.0001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.0001</iyy>
+          <iyz>0</iyz>
+          <izz>0.0001</izz>
+        </inertia>
+      </inertial>
+      <visual name="camera_visual">
+        <geometry>
+          <box>
+            <size>0.03 0.03 0.03</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0 0 1 1</ambient>
+          <diffuse>0 0 1 1</diffuse>
+        </material>
+      </visual>
+      <sensor name="fpv_camera" type="camera">
+        <pose>0 0 0 0 0 0</pose>
+        <camera>
+          <horizontal_fov>1.3962634</horizontal_fov>
+          <image>
+            <width>1080</width>
+            <height>720</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.1</near>
+            <far>1000</far>
+          </clip>
+        </camera>
+        <always_on>1</always_on>
+        <update_rate>90</update_rate>
+        <visualize>true</visualize>
+      </sensor>
+    </link>
+
+    <joint name="camera_joint" type="fixed">
+      <parent>base_link</parent>
+      <child>camera_link</child>
+    </joint>
+-------------------------------
+#3-----------------------------
+
+ardından simülasyonu çalıştırmadan
+
+cd PX4-Autopilot/
+export PX4_HOME_LAT=40.808556
+export PX4_HOME_LON=29.354972
+export PX4_HOME_ALT=10 # Örn. 10 metre yükseklik
+
+komutlarını terminale girin
+
