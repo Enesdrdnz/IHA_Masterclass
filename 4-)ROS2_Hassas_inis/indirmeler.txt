@@ -6,5 +6,6 @@ sudo apt install ros-humble-cv-bridge
 pip install opencv-contrib-python
 pip install "numpy<2"
 
-ros2 run ros_gz_bridge parameter_bridge /world/default/model/x500_gimbal_0/link/camera_link/sensor/camera/image@sensor_msgs/msg/Image@gz.msgs.Image --ros-args -r /world/default/model/x500_gimbal_0/link/camera_link/sensor/camera/image:=/camera/image_0
+ros2 run ros_gz_bridge parameter_bridge /camera@sensor_msgs/msg/Image@gz.msgs.Image --ros-args -r /camera:=/camera/image_0
+
 ros2 run rqt_image_view rqt_image_view
