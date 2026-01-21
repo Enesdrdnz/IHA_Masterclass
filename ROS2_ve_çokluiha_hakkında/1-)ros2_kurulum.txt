@@ -1,0 +1,35 @@
+
+
+conda deactivate
+export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu
+export CMAKE_PREFIX_PATH=/usr
+**
+sitedeki adımlarla devam edeceğiz videoda anlatılıyor
+**
+------------------------------------------------------------------------------------
+sudo apt install ros-humble-ros-gzharmonic
+camera topic ayarlama
+cd ws_sensor_combined
+source /opt/ros/humble/setup.bash
+source install/local_setup.bash
+
+--------------------------------------------------------------------------------------------
+ros2 run ros_gz_bridge parameter_bridge   /world/default/model/advanced_plane_0/link/camera_link/sensor/camera/image@sensor_msgs/msg/Image@gz.msgs.Image   --ros-args -r /world/default/model/advanced_plane_0/link/camera_link/sensor/camera/image:=/camera/image_ros_1
+--------------------------------------------------------------------------------------------
+opencv ye görüntüyü aktarma
+---------------------------
+sudo apt install ros-humble-cv-bridge
+sudo apt install python3-opencv
+# veya pip ile kurmanız gerekebilir
+pip install opencv-python
+ pip install numpy==1.26.4
+---------------------------------------------------------------------------------------
+MicroXRCEAgent udp4 -p 8888
+MicroXRCEAgent serial --dev /dev/ttyACM0 -b 921600
+---------------------------------------------------------------------------------------
+cd ws_sensor_combined/
+source install/local_setup.bash
+source /opt/ros/humble/setup.bash
+---------------------------------------------------------------------------------------
+ros2 run rqt_image_view rqt_image_view
+---------------------------------------------------------------------

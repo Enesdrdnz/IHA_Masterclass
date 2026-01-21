@@ -1,0 +1,65 @@
+1. Dinamik Engel Sakınma (Obstacle Avoidance)
+
+LiDAR veya derinlik kamerasından (Intel RealSense gibi) gelen nokta bulutu (Point Cloud) verisi ROS 2 üzerinde işlenir. Drone, PX4'ün standart rotasında giderken önüne bir engel çıktığında, ROS 2 üzerindeki bir algoritma (örneğin VFH veya A*) anlık olarak yeni bir trajectory_setpoint üretir. Bu, PX4'ün kendi başına yapamayacağı kadar yüksek işlem gücü gerektiren bir durumdur.
+--------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------
+2. Sürü İHA (Drone Swarm) Operasyonları
+
+Bahsettiğin sürü İHA senaryosu Offboard modunun en güçlü olduğu yerlerden biridir.
+
+    Lider-Takipçi (Leader-Follower): Lider drone'un konumu ROS 2 ağı üzerinden takipçilere aktarılır. Takipçiler, lidere göre kendi konumlarını anlık hesaplayıp Offboard üzerinden PX4'e iletir.
+
+    Merkezi Olmayan Çarpışma Önleme: Sürüdeki her drone, diğerlerinin konumunu dinleyerek (V2V haberleşme) birbirlerine çarpmadan karmaşık formasyonlar oluşturur.
+    --------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------
+3. GPS Olmayan Ortamlarda Navigasyon (Slam & VIO)
+
+Kapalı alanlarda veya tünellerde GPS sinyali yoktur. Bu durumda:
+
+    Visual Inertial Odometry (VIO): Kamera ve IMU verisi ROS 2'de birleştirilerek drone'un nerede olduğu hesaplanır.
+    Bu konum verisi PX4'e vehicle_visual_odometry topic'i üzerinden gönderilir ve drone Offboard modda bu "yapay" konuma göre hareket ettirilir.
+
+--------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------
+4. Hareketli Platformlara İniş
+
+Gemi veya hareket eden bir araç üzerine iniş yaparken:
+
+    Sadece AruCo marker yetmez; platformun hızı ve ivmesi de hesaplanmalıdır.
+
+    ROS 2, platformun hareketini tahmin eden bir Kalman Filtresi çalıştırır ve drone'u platformun "gelecekte olacağı noktaya" yönlendirir.
+--------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------
+5. Hassas Tarımsal Mücadele veya Boyama
+
+Drone'un sadece bir rotayı takip etmesi değil, püskürtme yapacağı ağacı veya boyayacağı yüzeyi kamera ile tanıması gerekir. Nesne ile arasındaki mesafeyi santimetrik hassasiyette korumak için Offboard modunda sürekli mesafe düzeltmesi (PID) yapılır.
+Senin İçin Bir Sonraki Adım: State Machine (Durum Makinesi) Tasarımı
+
+Senin bahsettiğin karmaşık senaryoları (Dogfight, QR Kamikaze vb.) yönetmek için kodunda bir State Machine yapısı kurmalısın. Çünkü drone'un ne zaman "Arama" modunda, ne zaman "Takip" modunda ve ne zaman "Kamikaze" modunda olduğunu bilmesi gerekir.
+--------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------
+6. Fotogrametri ve Yapı Teftişinde "Normal" Yönelme
+RÜZGAR TRIBÜNÜ BOYAMA IÇIN KULLANILAN DRONELAR
+
+Bir rüzgar türbinini veya köprüyü incelerken, kameranın her zaman yüzeye dik (perpendicular) bakması gerekir.
+
+    Offboard Kullanımı: Lidar verisi yüzeyin açısını hesaplar. ROS 2, drone'un sadece konumunu değil, VehicleAttitudeSetpoint üzerinden gövde açısını da (pitch/roll/yaw) yüzeye tam paralel olacak şekilde zorlar. PX4'ün standart modları genelde gövdeyi düz tutmaya programlıdır.
+    
+--------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------
+7. Havada Engelleme ve "Net-Throwing" (Drone Avcılığı)
+
+Sadece takip etmek (dogfight) yetmez, bazen fiziksel müdahale gerekir.
+
+    Senaryo: Yasaklı bölgeye giren bir drone'u ağ atarak yakalamak.
+
+    Offboard Kullanımı: Ağ fırlatıldığı an drone'un ağırlık merkezi (CoG) aniden değişir. PX4'ün standart PID kontrolcüleri bu ani yük değişimini "hata" olarak algılayıp drone'u sarsabilir. ROS 2 üzerinden çalışan bir Model Öngörülü Kontrolcü (MPC), ağın ağırlığını ve drone üzerindeki tork etkisini gerçek zamanlı tahmin ederek actuator_motors topic'ine doğrudan müdahale eder.
+--------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------
+8. Biyomimetik Uçuş (Rüzgar Akımlarını Kullanma)
+
+Albatros kuşları gibi, enerji harcamadan sadece rüzgarın hız farklarını (Dynamic Soaring) kullanarak uçmak.
+
+    Senaryo: Çok uzun menzilli sabit kanatlı (fixed-wing) İHA'ların batarya bitirmek yerine termal hava akımlarını takip etmesi.
+
+    Offboard Kullanımı: Drone üzerindeki pitot tüpü ve IMU verileri ROS 2'deki bir yapay sinir ağını besler. Algoritma, havadaki termal akımı tespit ettiği an PX4'ün motorlarını kapatır ve kanatçıkları (actuator_servos) en yüksek kaldırma kuvvetini alacak şekilde Offboard üzerinden yönetir. Bu, bir yapay zekanın "yelken kanat" yapmasıdır.
