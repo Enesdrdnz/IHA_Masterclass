@@ -1,0 +1,19 @@
+# Yükleyiciyi indirin
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+
+# Yükleyiciyi çalıştırın (Çıkan sorulara 'yes' diyerek ilerleyin)
+bash Miniconda3-latest-Linux-x86_64.sh
+
+source ~/.bashrc
+
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+
+#Ortamı oluştur
+conda create -n mavsdk_env python=3.10 -y
+
+# Ortamı aktif et
+conda activate mavsdk_env
+
+# MAVSDK'yı bu ortama kur
+pip install mavsdk
