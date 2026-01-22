@@ -1,0 +1,39 @@
+multi vehicle --»
+
+cd PX4-Autopilot/
+
+export PX4_HOME_LAT=40.808556
+export PX4_HOME_LON=29.354972
+export PX4_HOME_ALT=10 # Örn. 10 metre yükseklik
+
+make px4_sitl gz_advanced_plane
+PX4_SYS_AUTOSTART=4008 PX4_SIM_MODEL=gz_advanced_plane ./build/px4_sitl_default/bin/px4 -i 1
+---------------------------------------------------------------------------------------------------
+cd PX4-Autopilot/
+PX4_GZ_STANDALONE=1 PX4_SYS_AUTOSTART=4008 PX4_GZ_MODEL_POSE="-2,0,0.25,0,0,4.7" PX4_SIM_MODEL=gz_advanced_plane ./build/px4_sitl_default/bin/px4 -i 2
+---------------------------------------------------------------------------------------------------
+PX4_GZ_STANDALONE=1 PX4_SYS_AUTOSTART=4008 PX4_GZ_MODEL_POSE="0,2,0.15" PX4_SIM_MODEL=gz_advanced_plane ./build/px4_sitl_default/bin/px4 -i 2
+---------------------------------------------------------------------------------------------------
+PX4_GZ_STANDALONE=1 PX4_SYS_AUTOSTART=4008 PX4_GZ_MODEL_POSE="0,2,0.15" PX4_SIM_MODEL=gz_advanced_plane ./build/px4_sitl_default/bin/px4 -i 3
+---------------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+ros2 run ros_gz_bridge parameter_bridge   /world/default/model/advanced_plane_0/link/camera_link/sensor/camera/image@sensor_msgs/msg/Image@gz.msgs.Image   --ros-args -r /world/default/model/advanced_plane_0/link/camera_link/sensor/camera/image:=/camera/image_ros_1
+---------------------------------------------------------------------------
+ros2 run ros_gz_bridge parameter_bridge   /world/default/model/advanced_plane_2/link/camera_link/sensor/camera/image@sensor_msgs/msg/Image@gz.msgs.Image   --ros-args -r /world/default/model/advanced_plane_2/link/camera_link/sensor/camera/image:=/camera/image_ros_2
+----------------------------------------------------------------------------------------------
+ros2 run ros_gz_bridge parameter_bridge   /camera/image_raw@sensor_msgs/msg/Image@gz.msgs.Image   --ros-args -r /camera/image_raw:=/camera/image_ros_1
+----------------------------------------------------------------------------------------------
+ros2 run rqt_image_view rqt_image_view
+--------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------
+MicroXRCEAgent udp4 -p 8888
+---------------------------------------------------------------------------------------
+cd ws_sensor_combined/
+source install/local_setup.bash
+source /opt/ros/humble/setup.bash
+---------------------------------------------------------------------------------------
+MicroXRCEAgent serial --dev /dev/ttyACM0 -b 921600
+
+ros2 run ros_gz_bridge parameter_bridge /world/default/model/x500_gimbal_0/link/camera_link/sensor/camera/image@sensor_msgs/msg/Image@gz.msgs.Image --ros-args -r /world/default/model/x500_gimbal_0/link/camera_link/sensor/camera/image:=/camera/image_0
+
